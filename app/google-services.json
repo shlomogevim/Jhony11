@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "173251278740",
+    "project_id": "jhony11-d080a",
+    "storage_bucket": "jhony11-d080a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:173251278740:android:a83294b8cf961a46c44181",
+        "android_client_info": {
+          "package_name": "com.sg.jhony11"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "173251278740-437uu18du5g6gpn7ne3lnpb40ivpjk83.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANhUg7YUqCn09lsLgz5uC0vvhtXdhoBbA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "173251278740-437uu18du5g6gpn7ne3lnpb40ivpjk83.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

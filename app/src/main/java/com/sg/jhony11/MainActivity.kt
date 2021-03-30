@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.sg.jhony11.databinding.ActivityAddThoughtBinding
 import com.sg.jhony11.databinding.ActivityMainBinding
 
@@ -15,20 +16,24 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     var selectedCtegory = FUNNY
+    lateinit var thoughtAtapter:ThoughtsAdapter
+    val thoughts= arrayListOf<Thought>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
-       //setSupportActionBar(findViewById(R.id.toolbar))
-        val tr=1
 
        binding.fab.setOnClickListener { view ->
             val intent= Intent(this,AddThoughtActivity::class.java)
             startActivity(intent)
-
         }
+
+        thoughtAtapter= ThoughtsAdapter(thoughts)
+        binding.thoughtListView.adapter=thoughtAtapter
+        val layoutManager=LinearLayoutManager(this)
+        binding.thoughtListView.layoutManager=layoutManager
     }
     fun mainSeriousClick(view: View) {    //its toggle button every press toggle valuep
         if (selectedCtegory == SERIOUS) {

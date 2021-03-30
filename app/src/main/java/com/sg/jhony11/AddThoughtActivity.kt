@@ -2,24 +2,75 @@ package com.sg.jhony11
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.sg.jhony11.databinding.ActivityAddThoughtBinding
 
 class AddThoughtActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityAddThoughtBinding
+    var selectedCtegory = FUNNY
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_thought)
+        binding = ActivityAddThoughtBinding.inflate(layoutInflater)
+        setContentView(binding.root)
     }
 
-    fun addSeriosClick(view:View){
+    fun addPostClick(view: View) {
+        val data=HashMap<String,Any>()
+        data.put("category",selectedCtegory)
+        data.put("numComments",0)
+        data.put("numLikes",0)
+        data.put("thoughtTxt",binding.addToughtText.text.toString())
+        data.put("timestamp",FieldValue.serverTimestamp())
+        data.put("usename",binding.addUsernameText.text.toString())
+
+        FirebaseFirestore.getInstance().collection(THOUGHTS_REF).add(data)
+            .addOnSuccessListener {
+                finish()
+            }
+            .addOnFailureListener { exception->
+                Log.e("Exception","*** could not add post because : $exception")
+
+            }
 
     }
-    fun addFunnyClick(view:View){
+
+    fun addSeriosClick(view: View) {    //its toggle button every press toggle valuep
+        if (selectedCtegory == SERIOUS) {
+            binding.addSeriousBtn.isChecked = true
+            return
+        }
+        binding.addFunnyBtn.isChecked = false
+        binding.addCreazyBtn.isChecked = false
+        // binding.addFunnyBtn.isChecked=true
+        selectedCtegory = SERIOUS
 
     }
-    fun addCrazyClick(view:View){
+
+    fun addFunnyClick(view: View) {
+        if (selectedCtegory == FUNNY) {
+            binding.addFunnyBtn.isChecked = true
+            return
+        }
+        binding.addSeriousBtn.isChecked = false
+        binding.addCreazyBtn.isChecked = false
+        selectedCtegory = FUNNY
+    }
+
+    fun addCrazyClick(view: View) {
+        if (selectedCtegory == CRAZY) {
+            binding.addCreazyBtn.isChecked = true
+            return
+        }
+        binding.addSeriousBtn.isChecked = false
+        binding.addFunnyBtn.isChecked = false
+        // binding.addFunnyBtn.isChecked=true
+        selectedCtegory = CRAZY
 
     }
-    fun addPostClick(view:View){
 
-    }
+
 }

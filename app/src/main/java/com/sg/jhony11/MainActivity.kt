@@ -2,22 +2,20 @@ package com.sg.jhony11
 
 import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.sg.jhony11.databinding.ActivityAddThoughtBinding
+import com.google.firebase.firestore.FirebaseFirestore
 import com.sg.jhony11.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     var selectedCtegory = FUNNY
-    lateinit var thoughtAtapter:ThoughtsAdapter
-    val thoughts= arrayListOf<Thought>()
+    lateinit var thoughtAtapter: ThoughtsAdapter
+    val thoughts = arrayListOf<Thought>()
+    val thoughtCollectionRef = FirebaseFirestore.getInstance().collection(THOUGHTS_REF)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,16 +23,39 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
-       binding.fab.setOnClickListener { view ->
-            val intent= Intent(this,AddThoughtActivity::class.java)
+        binding.fab.setOnClickListener { view ->
+            val intent = Intent(this, AddThoughtActivity::class.java)
             startActivity(intent)
         }
 
-        thoughtAtapter= ThoughtsAdapter(thoughts)
-        binding.thoughtListView.adapter=thoughtAtapter
-        val layoutManager=LinearLayoutManager(this)
-        binding.thoughtListView.layoutManager=layoutManager
+        thoughtAtapter = ThoughtsAdapter(thoughts)
+        binding.thoughtListView.adapter = thoughtAtapter
+        val layoutManager = LinearLayoutManager(this)
+        binding.thoughtListView.layoutManager = layoutManager
+
+        thoughtCollectionRef
+            .get()
+            .addOnSuccessListener { snapshot ->
+                for (document in snapshot.documents) {
+                    val data = document.data
+                    val name = data?.get(USERNAME) as String
+                    val timestamp = data[TIMESTAMP] as com.google.firebase.Timestamp
+                    val thoghtTxt = data[THOUGHT_TXT] as String?
+                    val numLikes = data[NUM_LIKES] as Long
+                    val numComments = data[NUM_COMMENTS] as Long
+                    val documentId = document.id
+                    val newThought = Thought(name, timestamp ,thoghtTxt,numLikes.toInt(),
+                                     numComments.toInt(),documentId)
+                    thoughts.add(newThought)
+                }
+                thoughtAtapter.notifyDataSetChanged()
+
+            }.addOnFailureListener { exception ->
+                Log.e("Exception","*** could not add post in the mainActivity because : $exception")
+
+            }
     }
+
     fun mainSeriousClick(view: View) {    //its toggle button every press toggle valuep
         if (selectedCtegory == SERIOUS) {
             binding.mainSeriousBtn.isChecked = true
@@ -69,6 +90,7 @@ class MainActivity : AppCompatActivity() {
         selectedCtegory = CRAZY
 
     }
+
     fun mainPopularClick(view: View) {
         if (selectedCtegory == POPULAR) {
             binding.mainPopularBtn.isChecked = true

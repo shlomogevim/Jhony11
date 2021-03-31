@@ -41,12 +41,26 @@ class ThoughtsAdapter(val thoughts: ArrayList<Thought>) :
 
         fun bindThuoght(thought: Thought) {
             username?.text = thought.userName
-            thuoghtsText.text = thought.thoughtTxt
+            thuoghtsText?.text = thought.thoughtTxt
             numLikes?.text=thought.numLikes.toString()
 
-            val dateFormator=SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
-            val dateString=dateFormator.format(thought.timestamp)
-            timestap?.text=dateString
+            /* val dateFormator=SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
+               val dateString=dateFormator.format(thought.timestamp)
+               timestap?.text=dateString*/
+
+          /*   val date=thought.timestamp
+            val sfd =SimpleDateFormat("dd-MM-yyyy HH:mm:ss",Locale.getDefault())
+            val text=sfd.format(date)
+            timestap?.text=text*/
+
+         /* val millisecond=thought.timestamp.seconds*1000+thought.timestamp.nanoseconds
+            val sfd =SimpleDateFormat("MMM d, h:mm a")
+          val timeStamp=sfd.format()
+*/
+        timestap?.text=thought.timestamp?.toDate().toString()
+
+
+
         }
     }
 }

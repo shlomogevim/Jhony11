@@ -6,8 +6,10 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.sg.jhony11.databinding.ActivityMainBinding
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,18 +38,30 @@ class MainActivity : AppCompatActivity() {
         thoughtCollectionRef
             .get()
             .addOnSuccessListener { snapshot ->
+               if (snapshot!=null){
                 for (document in snapshot.documents) {
-                    val data = document.data
-                    val name = data?.get(USERNAME) as String
-                    val timestamp = data[TIMESTAMP] as com.google.firebase.Timestamp
-                    val thoghtTxt = data[THOUGHT_TXT] as String?
-                    val numLikes = data[NUM_LIKES] as Long
-                    val numComments = data[NUM_COMMENTS] as Long
-                    val documentId = document.id
-                    val newThought = Thought(name, timestamp ,thoghtTxt,numLikes.toInt(),
-                                     numComments.toInt(),documentId)
-                    thoughts.add(newThought)
+                        val data = document.data
+                        if (data!=null) {
+                            val name = data[USERNAME] as String
+                            val timestamp = data[TIMESTAMP] as Timestamp
+                            var thoghtTxt = "ff"
+                            if (data[THOUGHT_TXT]!=null) {
+                                thoghtTxt = data[THOUGHT_TXT] as String
+                            }
+                         //  val thoghtTxt = data[THOUGHT_TXT] as String
+                         //  val thoghtTxt = "ff"
+                            val numLikes = data[NUM_LIKES] as Long
+                            val numComments = data[NUM_COMMENTS] as Long
+                            val documentId = document.id
+                            val newThought = Thought(
+                                name, timestamp, thoghtTxt, numLikes.toInt(),
+                                numComments.toInt(), documentId
+                            )
+                            thoughts.add(newThought)
+                        }
+
                 }
+               }
                 thoughtAtapter.notifyDataSetChanged()
 
             }.addOnFailureListener { exception ->
@@ -55,6 +69,8 @@ class MainActivity : AppCompatActivity() {
 
             }
     }
+
+
 
     fun mainSeriousClick(view: View) {    //its toggle button every press toggle valuep
         if (selectedCtegory == SERIOUS) {

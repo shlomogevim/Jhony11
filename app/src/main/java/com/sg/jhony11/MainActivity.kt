@@ -8,6 +8,7 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.sg.jhony11.databinding.ActivityMainBinding
 import java.util.*
 
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var thoughtAtapter: ThoughtsAdapter
     val thoughts = arrayListOf<Thought>()
     val thoughtCollectionRef = FirebaseFirestore.getInstance().collection(THOUGHTS_REF)
+    lateinit var thoghtsListener:ListenerRegistration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,42 +37,41 @@ class MainActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this)
         binding.thoughtListView.layoutManager = layoutManager
 
-        thoughtCollectionRef
-            .get()
-            .addOnSuccessListener { snapshot ->
-               if (snapshot!=null){
-                for (document in snapshot.documents) {
-                        val data = document.data
-                        if (data!=null) {
-                            val name = data[USERNAME] as String
-                            val timestamp = data[TIMESTAMP] as Timestamp
-                            var thoghtTxt = "ff"
-                            if (data[THOUGHT_TXT]!=null) {
-                                thoghtTxt = data[THOUGHT_TXT] as String
-                            }
-                         //  val thoghtTxt = data[THOUGHT_TXT] as String
-                         //  val thoghtTxt = "ff"
-                            val numLikes = data[NUM_LIKES] as Long
-                            val numComments = data[NUM_COMMENTS] as Long
-                            val documentId = document.id
-                            val newThought = Thought(
-                                name, timestamp, thoghtTxt, numLikes.toInt(),
-                                numComments.toInt(), documentId
-                            )
-                            thoughts.add(newThought)
-                        }
-
-                }
-               }
-                thoughtAtapter.notifyDataSetChanged()
-
-            }.addOnFailureListener { exception ->
-                Log.e("Exception","*** could not add post in the mainActivity because : $exception")
-
-            }
     }
 
+fun setListener(){
+    thoghtsListener=thoughtCollectionRef.addSnapshotListener { snapshot, exception ->
+   
+        if (exception!=null){
+            Log.e("Exception","*** Could not retrive documents because : $exception")
+        }
+        if (snapshot!=null){
+            if (snapshot!=null){
+                for (document in snapshot.documents) {
+                    val data = document.data
+                    if (data!=null) {
+                        val name = data[USERNAME] as String
+                        val timestamp = data[TIMESTAMP] as Timestamp
+                        var thoghtTxt = "No data"
+                        if (data[THOUGHT_TXT]!=null) {
+                            thoghtTxt = data[THOUGHT_TXT] as String
+                        }
+                        val numLikes = data[NUM_LIKES] as Long
+                        val numComments = data[NUM_COMMENTS] as Long
+                        val documentId = document.id
+                        val newThought = Thought(
+                            name, timestamp, thoghtTxt, numLikes.toInt(),
+                            numComments.toInt(), documentId
+                        )
+                        thoughts.add(newThought)
+                    }
 
+                }
+            }
+            thoughtAtapter.notifyDataSetChanged()
+        }
+    }
+}
 
     fun mainSeriousClick(view: View) {    //its toggle button every press toggle valuep
         if (selectedCtegory == SERIOUS) {

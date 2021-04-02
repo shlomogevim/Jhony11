@@ -45,38 +45,77 @@ class MainActivity : AppCompatActivity() {
     }
 
 fun setListener(){
-    thoghtListner=thoughtCollectionRef
-        .orderBy(TIMESTAMP,Query.Direction.DESCENDING)
-        .addSnapshotListener(this) { snapshot,exception ->
+    if (selectedCtegory== POPULAR){
+        thoghtListner=thoughtCollectionRef
+            .orderBy(NUM_LIKES,Query.Direction.DESCENDING)
+            .addSnapshotListener(this) { snapshot,exception ->
 
-        if (exception !=null){
-            Log.e("Exception","*** could not retrive documents : $exception")
-        }
-        if (snapshot!=null){
-            thoughts.clear()
-                for (document in snapshot.documents) {
-                    val data = document.data
-                    if (data!=null) {
-                        val name = data[USERNAME] as String
-                        val timestamp = data[TIMESTAMP] as Timestamp
-                        var thoghtTxt = "ff"
-                        if (data[THOUGHT_TXT]!=null) {
-                            thoghtTxt = data[THOUGHT_TXT] as String
-                        }
-                        val numLikes = data[NUM_LIKES] as Long
-                        val numComments = data[NUM_COMMENTS] as Long
-                        val documentId = document.id
-                        val newThought = Thought(
-                            name, timestamp, thoghtTxt, numLikes.toInt(),
-                            numComments.toInt(), documentId
-                        )
-                        thoughts.add(newThought)
-                    }
-
+                if (exception !=null){
+                    Log.e("Exception","*** could not retrive documents : $exception")
                 }
+                if (snapshot!=null){
+                    thoughts.clear()
+                    for (document in snapshot.documents) {
+                        val data = document.data
+                        if (data!=null) {
+                            val name = data[USERNAME] as String
+                            val timestamp = data[TIMESTAMP] as Timestamp
+                            var thoghtTxt = "ff"
+                            if (data[THOUGHT_TXT]!=null) {
+                                thoghtTxt = data[THOUGHT_TXT] as String
+                            }
+                            val numLikes = data[NUM_LIKES] as Long
+                            val numComments = data[NUM_COMMENTS] as Long
+                            val documentId = document.id
+                            val newThought = Thought(
+                                name, timestamp, thoghtTxt, numLikes.toInt(),
+                                numComments.toInt(), documentId
+                            )
+                            thoughts.add(newThought)
+                        }
+
+                    }
+                }
+                thoughtAtapter.notifyDataSetChanged()
             }
-            thoughtAtapter.notifyDataSetChanged()
+    }else{
+        thoghtListner=thoughtCollectionRef
+            .orderBy(TIMESTAMP,Query.Direction.DESCENDING)
+            .whereEqualTo(CATEGORY,selectedCtegory)
+            .addSnapshotListener(this) { snapshot,exception ->
+
+                if (exception !=null){
+                    Log.e("Exception","*** could not retrive documents : $exception")
+                }
+                if (snapshot!=null){
+                    thoughts.clear()
+                    for (document in snapshot.documents) {
+                        val data = document.data
+                        if (data!=null) {
+
+                            val name = data[USERNAME] as String
+                            val timestamp = data[TIMESTAMP] as Timestamp
+                            var thoghtTxt = "ff"
+                            if (data[THOUGHT_TXT]!=null) {
+                                thoghtTxt = data[THOUGHT_TXT] as String
+                            }
+                            val numLikes = data[NUM_LIKES] as Long
+                            Log.i("message","numLikes=$numLikes")
+                            val numComments = data[NUM_COMMENTS] as Long
+                            val documentId = document.id
+                            val newThought = Thought(
+                                name, timestamp, thoghtTxt, numLikes.toInt(),
+                                numComments.toInt(), documentId
+                            )
+                            thoughts.add(newThought)
+                        }
+
+                    }
+                }
+                thoughtAtapter.notifyDataSetChanged()
+            }
     }
+
 }
 
     fun mainSeriousClick(view: View) {    //its toggle button every press toggle valuep
@@ -88,7 +127,8 @@ fun setListener(){
         binding.mainCrazyBtn.isChecked = false
         binding.mainPopularBtn.isChecked = false
         selectedCtegory = SERIOUS
-
+        thoghtListner.remove()
+        setListener()
     }
 
     fun mainFunnyClick(view: View) {
@@ -100,6 +140,8 @@ fun setListener(){
         binding.mainCrazyBtn.isChecked = false
         binding.mainPopularBtn.isChecked = false
         selectedCtegory = FUNNY
+        thoghtListner.remove()
+        setListener()
     }
 
     fun mainCrazyClick(view: View) {
@@ -111,7 +153,8 @@ fun setListener(){
         binding.mainFunnyBtn.isChecked = false
         binding.mainPopularBtn.isChecked = false
         selectedCtegory = CRAZY
-
+        thoghtListner.remove()
+        setListener()
     }
 
     fun mainPopularClick(view: View) {

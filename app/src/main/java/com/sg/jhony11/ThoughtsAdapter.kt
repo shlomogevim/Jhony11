@@ -8,6 +8,7 @@ import android.view.Window
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
 import com.sg.jhony11.databinding.ActivityAddThoughtBinding
 import com.sg.jhony11.databinding.ThoughtListViewBinding
 import java.lang.reflect.Array.get
@@ -20,7 +21,8 @@ class ThoughtsAdapter(val thoughts: ArrayList<Thought>) :
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view=LayoutInflater.from(parent?.context).inflate(R.layout.thought_list_view,parent,false)
+        val view =
+            LayoutInflater.from(parent?.context).inflate(R.layout.thought_list_view, parent, false)
         return ViewHolder(view)
 
     }
@@ -34,33 +36,20 @@ class ThoughtsAdapter(val thoughts: ArrayList<Thought>) :
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val username = itemView?.findViewById<TextView>(R.id.listViewUsername)
-        val timestap =  itemView?.findViewById<TextView>(R.id.listViewTimestamp)
+        val timestap = itemView?.findViewById<TextView>(R.id.listViewTimestamp)
         val thuoghtsText = itemView?.findViewById<TextView>(R.id.listViewToughtTxt)
-        val numLikes =  itemView?.findViewById<TextView>(R.id.listViewNumLikes)
-        val likesImage =  itemView?.findViewById<ImageView>(R.id.listViewLikesImage)
+        val numLikes = itemView?.findViewById<TextView>(R.id.listViewNumLikes)
+        val likesImage = itemView?.findViewById<ImageView>(R.id.listViewLikesImage)
 
         fun bindThuoght(thought: Thought) {
             username?.text = thought.userName
             thuoghtsText?.text = thought.thoughtTxt
-            numLikes?.text=thought.numLikes.toString()
-
-            /* val dateFormator=SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
-               val dateString=dateFormator.format(thought.timestamp)
-               timestap?.text=dateString*/
-
-          /*   val date=thought.timestamp
-            val sfd =SimpleDateFormat("dd-MM-yyyy HH:mm:ss",Locale.getDefault())
-            val text=sfd.format(date)
-            timestap?.text=text*/
-
-         /* val millisecond=thought.timestamp.seconds*1000+thought.timestamp.nanoseconds
-            val sfd =SimpleDateFormat("MMM d, h:mm a")
-          val timeStamp=sfd.format()
-*/
-        timestap?.text=thought.timestamp?.toDate().toString()
-
-
-
+            numLikes?.text = thought.numLikes.toString()
+            timestap?.text = thought.timestamp?.toDate().toString()
+            likesImage?.setOnClickListener {
+                FirebaseFirestore.getInstance().collection(THOUGHTS_REF).document(thought.documentId)
+                    .update(NUM_LIKES,thought.numLikes+1)
+            }
         }
     }
 }

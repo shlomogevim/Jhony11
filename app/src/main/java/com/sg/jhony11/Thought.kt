@@ -5,8 +5,8 @@ import java.util.*
 
 data class Thought constructor(
     val userName:String,
-    val timestamp: Timestamp?,
-    val thoughtTxt: String,
+    val timestamp:Timestamp?,
+    val thoughtTxt:String,
     val numLikes:Int,
     val numComments:Int,
     val documentId:String
